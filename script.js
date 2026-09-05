@@ -3,7 +3,7 @@
  * - Atmospheric First-Page Surprise Gateway with Touch Unlock
  * - Automated Cinematic Cake Ceremony Sequencer
  * - Warm Confetti Engine
- * - Persistent Guestbook
+ * - Interactive 3D Mystery Gift Box & Golden Pass Unboxing
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -75,6 +75,47 @@ document.addEventListener('DOMContentLoaded', () => {
         gain.connect(ctx.destination);
         osc.start(t);
         osc.stop(t + 0.9);
+      });
+    },
+    playRibbonUntie() {
+      const ctx = this._getCtx();
+      if (!ctx) return;
+      const t = ctx.currentTime;
+      // High sparkle glide
+      [880, 1174.66, 1567.98].forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, t + idx * 0.06);
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.25, t + idx * 0.06 + 0.2);
+        gain.gain.setValueAtTime(0, t + idx * 0.06);
+        gain.gain.linearRampToValueAtTime(0.12, t + idx * 0.06 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.06 + 0.35);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t + idx * 0.06);
+        osc.stop(t + idx * 0.06 + 0.35);
+      });
+    },
+    playGiftFanfare() {
+      const ctx = this._getCtx();
+      if (!ctx) return;
+      const t = ctx.currentTime;
+      // Royal ascending triumphant chord
+      const fanfareNotes = [440, 554.37, 659.25, 880, 1108.73];
+      fanfareNotes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        const noteStart = t + idx * 0.09;
+        osc.frequency.setValueAtTime(freq, noteStart);
+        gain.gain.setValueAtTime(0, noteStart);
+        gain.gain.linearRampToValueAtTime(0.2, noteStart + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, noteStart + 1.2);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(noteStart);
+        osc.stop(noteStart + 1.2);
       });
     }
   };
@@ -720,153 +761,208 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // 6. GUESTBOOK / BIRTHDAY WISHES BOARD
+  // 6. 3D INTERACTIVE MYSTERY GIFT BOX & GOLDEN PASS UNBOXING SEQUENCER
   // =========================================================================
-  const warmWishForm = document.getElementById('warmWishForm');
-  const wishesPinBoard = document.getElementById('wishesPinBoard');
-  const wisherName = document.getElementById('wisherName');
-  const wisherText = document.getElementById('wisherText');
-  const resetWishesBtn = document.getElementById('resetWishesBtn');
+  const giftStageWrapper = document.getElementById('giftStageWrapper');
+  const giftBox3d = document.getElementById('giftBox3d');
+  const goldenBowAssembly = document.getElementById('goldenBowAssembly');
+  const giftStatusRibbon = document.getElementById('giftStatusRibbon');
+  const giftLightBurst = document.getElementById('giftLightBurst');
+  const goldenVoucherReveal = document.getElementById('goldenVoucherReveal');
+  const reboxGiftBtn = document.getElementById('reboxGiftBtn');
+  const claimPassBtn = document.getElementById('claimPassBtn');
+  const giftSparkleCanvas = document.getElementById('giftSparkleCanvas');
 
-  const defaultWishes = [
-    {
-      name: 'Arsh (Big Brother) ❤️',
-      text: 'Faizu, you will always have my back, my loyalty, and my love. Never stop dreaming big, little bro!',
-      time: 'Just now'
-    },
-    {
-      name: 'Mom & Dad 🤲',
-      text: 'May Allah bless you with a long, healthy, and honorable life. We are endlessly proud of you!',
-      time: 'Today'
-    },
-    {
-      name: 'The Squad 🍕',
-      text: 'Happy Birthday Faizu! Treat is on you this weekend bro, no excuses! Enjoy your day to the fullest!',
-      time: 'Today'
+  let giftState = 'wrapped'; // 'wrapped' -> 'untied' -> 'opened'
+  let giftParticles = [];
+  let burstActive = false;
+
+  // Gift Sparkle Canvas
+  if (giftSparkleCanvas) {
+    const gCtx = giftSparkleCanvas.getContext('2d');
+
+    function resizeGiftCanvas() {
+      giftSparkleCanvas.width = giftSparkleCanvas.offsetWidth || 800;
+      giftSparkleCanvas.height = giftSparkleCanvas.offsetHeight || 520;
     }
-  ];
+    resizeGiftCanvas();
+    window.addEventListener('resize', resizeGiftCanvas);
 
-  function getStoredWishes() {
-    try {
-      const stored = localStorage.getItem('faizu_bday_guestbook_v1');
-      return stored ? JSON.parse(stored) : defaultWishes;
-    } catch (e) {
-      return defaultWishes;
-    }
-  }
+    function spawnGiftSparkle(burst = false) {
+      const w = giftSparkleCanvas.width;
+      const h = giftSparkleCanvas.height;
+      const cx = w * 0.5;
+      const cy = h * 0.45;
 
-  function renderWishes() {
-    if (!wishesPinBoard) return;
-    const wishes = getStoredWishes();
-    wishesPinBoard.innerHTML = '';
-
-    if (wishes.length === 0) {
-      wishesPinBoard.innerHTML = `
-        <div class="empty-wishes-msg">
-          <span class="empty-icon">💌</span>
-          <p>No wishes on the board right now.</p>
-          <small>Be the first to post a new wish for Faizu!</small>
-        </div>
-      `;
-      return;
-    }
-
-    wishes.forEach((w, index) => {
-      const card = document.createElement('div');
-      card.className = 'wish-post-card';
-      card.innerHTML = `
-        <div class="wish-card-header">
-          <span class="wish-author">${escapeHTML(w.name)}</span>
-          <div class="wish-meta-actions">
-            <span class="wish-time">${escapeHTML(w.time)}</span>
-            <button class="delete-wish-btn" data-index="${index}" title="Delete Wish" aria-label="Delete Wish">
-              <i class="fa-solid fa-trash-can"></i>
-            </button>
-          </div>
-        </div>
-        <p class="wish-message">${escapeHTML(w.text)}</p>
-      `;
-
-      const delBtn = card.querySelector('.delete-wish-btn');
-      if (delBtn) {
-        delBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          deleteWish(index);
+      if (burst) {
+        for (let i = 0; i < 35; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = Math.random() * 5 + 2;
+          giftParticles.push({
+            x: cx + (Math.random() - 0.5) * 40,
+            y: cy + (Math.random() - 0.5) * 40,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 1.8,
+            size: Math.random() * 3.5 + 1.5,
+            color: ['#ffffff', '#dfb15b', '#fae4c3', '#fb7185', '#fde047'][Math.floor(Math.random() * 5)],
+            alpha: 1,
+            decay: Math.random() * 0.025 + 0.015
+          });
+        }
+      } else if (giftParticles.length < 24) {
+        giftParticles.push({
+          x: cx + (Math.random() - 0.5) * 220,
+          y: cy + (Math.random() - 0.5) * 160 + 30,
+          vx: (Math.random() - 0.5) * 0.6,
+          vy: -(Math.random() * 0.8 + 0.3),
+          size: Math.random() * 2.2 + 0.8,
+          color: ['#fae4c3', '#dfb15b', '#ffffff', '#ffd166'][Math.floor(Math.random() * 4)],
+          alpha: Math.random() * 0.8 + 0.2,
+          decay: Math.random() * 0.012 + 0.006
         });
       }
+    }
 
-      wishesPinBoard.appendChild(card);
-    });
+    function renderGiftSparkles() {
+      gCtx.clearRect(0, 0, giftSparkleCanvas.width, giftSparkleCanvas.height);
+      if (giftState !== 'opened' || burstActive) {
+        spawnGiftSparkle(burstActive);
+        burstActive = false;
+      }
+      for (let i = giftParticles.length - 1; i >= 0; i--) {
+        const p = giftParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) {
+          giftParticles.splice(i, 1);
+          continue;
+        }
+        gCtx.save();
+        gCtx.globalAlpha = p.alpha;
+        gCtx.fillStyle = p.color;
+        gCtx.shadowColor = p.color;
+        gCtx.shadowBlur = 6;
+        gCtx.beginPath();
+        gCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        gCtx.fill();
+        gCtx.restore();
+      }
+      requestAnimationFrame(renderGiftSparkles);
+    }
+    renderGiftSparkles();
   }
 
-  function deleteWish(index) {
-    if (confirm('Are you sure you want to delete this wish note?')) {
-      const wishes = getStoredWishes();
-      if (index >= 0 && index < wishes.length) {
-        wishes.splice(index, 1);
-        try {
-          localStorage.setItem('faizu_bday_guestbook_v1', JSON.stringify(wishes));
-        } catch (err) {
-          console.warn('Could not save updated wishes to localStorage', err);
-        }
-        renderWishes();
+  // Interactive Unbox Trigger
+  function handleGiftInteraction() {
+    if (!giftBox3d) return;
+
+    if (giftState === 'wrapped') {
+      // Step 1: Untie ribbon
+      giftState = 'untied';
+      audio.playRibbonUntie();
+      giftBox3d.classList.add('ribbon-untied');
+      burstActive = true;
+
+      if (giftStatusRibbon) {
+        giftStatusRibbon.classList.add('highlight');
+        giftStatusRibbon.innerHTML = `
+          <span class="gift-status-icon">🔓</span>
+          <span class="gift-status-text">Ribbon untied! Now tap the box or lid to open your surprise!</span>
+        `;
       }
+    } else if (giftState === 'untied') {
+      // Step 2: Open lid & reveal pass
+      giftState = 'opened';
+      audio.playGiftFanfare();
+      giftBox3d.classList.add('box-opened');
+      if (giftLightBurst) giftLightBurst.classList.add('active');
+      burstActive = true;
+
+      // Confetti burst from box position
+      const rect = giftBox3d.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      triggerWarmConfetti(centerX, centerY, 130);
+
+      // Reveal floating golden pass voucher
+      setTimeout(() => {
+        if (giftStageWrapper) giftStageWrapper.classList.add('is-unboxed');
+        giftBox3d.classList.add('voucher-expanded');
+        if (goldenVoucherReveal) goldenVoucherReveal.classList.add('revealed');
+        if (giftStatusRibbon) {
+          giftStatusRibbon.classList.remove('highlight');
+          giftStatusRibbon.classList.add('unlocked');
+          giftStatusRibbon.innerHTML = `
+            <span class="gift-status-icon">🎉</span>
+            <span class="gift-status-text">Surprise Unboxed! Your Brotherhood Golden Pass is active!</span>
+          `;
+        }
+      }, 420);
     }
   }
 
-  function escapeHTML(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  renderWishes();
-
-  if (resetWishesBtn) {
-    resetWishesBtn.addEventListener('click', () => {
-      if (confirm('Reset wishes back to default notes?')) {
-        localStorage.removeItem('faizu_bday_guestbook_v1');
-        renderWishes();
+  if (giftBox3d) {
+    giftBox3d.addEventListener('click', handleGiftInteraction);
+    giftBox3d.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleGiftInteraction();
       }
     });
   }
 
-  if (warmWishForm) {
-    warmWishForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const nameVal = wisherName.value.trim();
-      const textVal = wisherText.value.trim();
-      if (!nameVal || !textVal) return;
+  if (goldenBowAssembly) {
+    goldenBowAssembly.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleGiftInteraction();
+    });
+  }
 
-      const newWish = {
-        name: nameVal,
-        text: textVal,
-        time: 'Just now'
-      };
-
-      const wishes = getStoredWishes();
-      wishes.unshift(newWish);
-
-      try {
-        localStorage.setItem('faizu_bday_guestbook_v1', JSON.stringify(wishes));
-      } catch (err) {
-        console.warn('Storage quota exceeded');
-      }
-
-      renderWishes();
-      wisherName.value = '';
-      wisherText.value = '';
-
+  // Re-box & replay surprise
+  if (reboxGiftBtn) {
+    reboxGiftBtn.addEventListener('click', () => {
       audio.playDing();
-      triggerWarmConfetti(window.innerWidth * 0.5, window.innerHeight * 0.6, 90);
+      if (goldenVoucherReveal) goldenVoucherReveal.classList.remove('revealed');
+      if (giftBox3d) giftBox3d.classList.remove('voucher-expanded');
+      if (giftLightBurst) giftLightBurst.classList.remove('active');
+      if (giftStageWrapper) giftStageWrapper.classList.remove('is-unboxed');
+
+      setTimeout(() => {
+        if (giftBox3d) {
+          giftBox3d.classList.remove('box-opened');
+          giftBox3d.classList.remove('ribbon-untied');
+        }
+        if (giftStatusRibbon) {
+          giftStatusRibbon.classList.remove('unlocked', 'highlight');
+          giftStatusRibbon.innerHTML = `
+            <span class="gift-status-icon">🎀</span>
+            <span class="gift-status-text">Tap the golden bow or gift box to untie the ribbon!</span>
+          `;
+        }
+        giftState = 'wrapped';
+      }, 350);
+    });
+  }
+
+  // Claim Pass celebration
+  if (claimPassBtn) {
+    claimPassBtn.addEventListener('click', () => {
+      audio.playDing();
+      triggerWarmConfetti(window.innerWidth * 0.5, window.innerHeight * 0.5, 100);
+      claimPassBtn.innerHTML = '<i class="fa-solid fa-check-double"></i> Pass Activated for Life! ❤️';
+      claimPassBtn.style.pointerEvents = 'none';
+      setTimeout(() => {
+        claimPassBtn.style.pointerEvents = 'auto';
+      }, 2000);
     });
   }
 
   // =========================================================================
-  // 8. DYNAMIC 3D CARD PERSPECTIVE TILT PHYSICS
+  // 7. DYNAMIC 3D CARD PERSPECTIVE TILT PHYSICS
   // =========================================================================
   function initCard3dTilt() {
-    const tiltElements = document.querySelectorAll('.gateway-card, .cake-card-wrapper, .polaroid-frame, .vintage-parchment-sheet, .guestbook-form-card');
+    const tiltElements = document.querySelectorAll('.gateway-card, .cake-card-wrapper, .polaroid-frame, .vintage-parchment-sheet, .voucher-card');
 
     tiltElements.forEach(el => {
       el.addEventListener('mousemove', (e) => {
@@ -946,3 +1042,125 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
+/* ==========================================================================
+   PREMIUM LUXURY AMBIENCE - ENHANCED BACKGROUND & ANIMATION DRIVER
+   Pure additive module. Builds the starfield, cursor spotlight and the
+   rising love particles. Does not touch any existing component.
+   ========================================================================== */
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  // -----------------------------------------------------------------------
+  // A. Twinkling luxury starfield
+  // -----------------------------------------------------------------------
+  const starfield = document.getElementById('luxStarfield');
+  if (starfield && !reduceMotion) {
+    const starCount = Math.min(80, Math.floor(window.innerWidth / 16));
+
+    for (let i = 0; i < starCount; i++) {
+      const star = document.createElement('span');
+      star.className = 'lux-star';
+      const size = (Math.random() * 2 + 1).toFixed(2);
+      star.style.width = size + 'px';
+      star.style.height = size + 'px';
+      star.style.top = (Math.random() * 100).toFixed(2) + '%';
+      star.style.left = (Math.random() * 100).toFixed(2) + '%';
+      star.style.setProperty('--dur', (Math.random() * 3.5 + 2.2).toFixed(2) + 's');
+      star.style.setProperty('--delay', (Math.random() * 6).toFixed(2) + 's');
+      starfield.appendChild(star);
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // B. Golden cursor spotlight
+  // -----------------------------------------------------------------------
+  const cursorGlow = document.getElementById('luxCursorGlow');
+  if (cursorGlow && finePointer && !reduceMotion) {
+    let rafId = null;
+
+    const moveGlow = (x, y) => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        cursorGlow.style.setProperty('--cx', x + 'px');
+        cursorGlow.style.setProperty('--cy', y + 'px');
+        rafId = null;
+      });
+    };
+
+    window.addEventListener('pointermove', (e) => {
+      cursorGlow.classList.add('is-active');
+      moveGlow(e.clientX, e.clientY);
+    }, { passive: true });
+
+    window.addEventListener('pointerout', () => cursorGlow.classList.remove('is-active'));
+  }
+
+  // -----------------------------------------------------------------------
+  // C. Rising love particles (hearts, sparkles, stars, balloons)
+  // -----------------------------------------------------------------------
+  const floatLayer = document.getElementById('luxFloatingParticles');
+  if (floatLayer && !reduceMotion) {
+    const emojis = ['\u2764\uFE0F', '\uD83D\uDC9B', '\u2728', '\u2B50', '\uD83C\uDF88', '\uD83D\uDCAB', '\uD83D\uDDA4'];
+    const maxParticles = 26;
+    let spawnTimer = null;
+
+    const spawnParticle = () => {
+      if (floatLayer.querySelectorAll('.lux-floatly').length >= maxParticles) return;
+
+      const p = document.createElement('span');
+      p.className = 'lux-floatly';
+      p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+      const size = Math.random() * 16 + 12;
+      const duration = Math.random() * 9 + 8;
+
+      p.style.left = (Math.random() * 100).toFixed(2) + '%';
+      p.style.fontSize = size.toFixed(1) + 'px';
+      p.style.setProperty('--dur', duration.toFixed(1) + 's');
+      p.style.setProperty('--drift', (Math.random() * 140 - 70).toFixed(1) + 'px');
+      p.style.setProperty('--spin', (Math.random() * 240 + 90).toFixed(0) + 'deg');
+      p.style.setProperty('--start-scale', (Math.random() * 0.4 + 0.5).toFixed(2));
+      p.style.setProperty('--end-scale', (Math.random() * 0.6 + 1).toFixed(2));
+      p.style.setProperty('--peak-opacity', (Math.random() * 0.3 + 0.3).toFixed(2));
+
+      p.addEventListener('animationend', () => p.remove());
+      floatLayer.appendChild(p);
+    };
+
+    const startSpawning = () => {
+      if (spawnTimer) return;
+      spawnTimer = setInterval(spawnParticle, 850);
+    };
+
+    // Pause when the site is not visible
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && spawnTimer) {
+        clearInterval(spawnTimer);
+        spawnTimer = null;
+      } else if (!document.hidden) {
+        startSpawning();
+      }
+    });
+
+    startSpawning();
+  }
+
+  // -----------------------------------------------------------------------
+  // D. Gentle scroll parallax on the starfield
+  // -----------------------------------------------------------------------
+  if (starfield && finePointer && !reduceMotion) {
+    let scrollRaf = null;
+
+    window.addEventListener('scroll', () => {
+      if (scrollRaf) return;
+      scrollRaf = requestAnimationFrame(() => {
+        starfield.style.transform = 'translate3d(0, ' + (window.scrollY * -0.04).toFixed(1) + 'px, 0)';
+        scrollRaf = null;
+      });
+    }, { passive: true });
+  }
+
+});

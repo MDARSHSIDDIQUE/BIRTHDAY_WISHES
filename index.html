@@ -19,6 +19,20 @@
 <body>
 
   <!-- ========================================================== -->
+  <!-- PREMIUM AMBIENT BACKGROUND & EFFECT LAYERS (decoration only) -->
+  <!-- ========================================================== -->
+  <div class="lux-bg-layer" aria-hidden="true">
+    <div class="lux-orb orb-gold"></div>
+    <div class="lux-orb orb-rose"></div>
+    <div class="lux-orb orb-violet"></div>
+    <div class="lux-starfield" id="luxStarfield"></div>
+  </div>
+  <div class="lux-vignette" aria-hidden="true"></div>
+  <div class="lux-grain" aria-hidden="true"></div>
+  <div id="luxFloatingParticles" class="lux-float-layer" aria-hidden="true"></div>
+  <div class="lux-cursor-glow" id="luxCursorGlow" aria-hidden="true"></div>
+
+  <!-- ========================================================== -->
   <!-- 1. MEANINGFUL FIRST-PAGE SURPRISE GATEWAY (CLICK BUTTON TO UNLOCK) -->
   <!-- ========================================================== -->
   <div class="surprise-gateway" id="surpriseGateway">
@@ -114,7 +128,7 @@
         <a href="#cakeSection" class="nav-pill-btn"><i class="fa-solid fa-cake-candles"></i> The Cake</a>
         <a href="#photoWall" class="nav-pill-btn"><i class="fa-solid fa-camera"></i> Our Polaroids</a>
         <a href="#bhaiLetter" class="nav-pill-btn"><i class="fa-solid fa-heart"></i> My Letter to You</a>
-        <a href="#wishesSection" class="nav-pill-btn"><i class="fa-solid fa-pen-fancy"></i> Leave a Wish</a>
+        <a href="#giftSection" class="nav-pill-btn"><i class="fa-solid fa-gift"></i> Birthday Gift</a>
       </nav>
 
       <div class="down-indicator">
@@ -361,42 +375,205 @@
     </section>
 
     <!-- ========================================================== -->
-    <!-- 6. WISHES GUESTBOOK                                        -->
+    <!-- 6. INTERACTIVE 3D MYSTERY GIFT BOX UNBOXING                -->
     <!-- ========================================================== -->
-    <section id="wishesSection" class="content-section reveal-on-scroll">
+    <section id="giftSection" class="content-section reveal-on-scroll">
       <div class="section-title-wrap">
-        <span class="handwritten-sub">Leave Some Love</span>
-        <h2 class="section-heading">Birthday Wishes For Faizu ✍️</h2>
-        <button id="resetWishesBtn" class="btn-subtle-link">Reset Wishes</button>
+        <span class="handwritten-sub">One Last Surprise For You</span>
+        <h2 class="section-heading">Unbox Your Birthday Gift 🎁</h2>
+        <p class="section-intro">
+          Tap the golden bow to untie the ribbon, then lift the lid to reveal what's inside!
+        </p>
       </div>
 
-      <div class="guestbook-container">
-        <!-- Form -->
-        <form id="warmWishForm" class="guestbook-form-card">
-          <h3>Write a wish for Faizu:</h3>
-          <div class="form-field">
-            <label for="wisherName">Your Name / Relationship</label>
-            <input type="text" id="wisherName" placeholder="e.g. Arsh, Mom & Dad, Friend..." required maxlength="40">
-          </div>
-          <div class="form-field">
-            <label for="wisherText">Your Message / Blessing</label>
-            <textarea id="wisherText" rows="3" placeholder="Leave a warm birthday message for Faizu..." required maxlength="300"></textarea>
-          </div>
-          <button type="submit" class="btn-aesthetic btn-warm btn-full">
-            <i class="fa-solid fa-paper-plane"></i> Post Wish on Board
-          </button>
-        </form>
-
-        <!-- Feed -->
-        <div class="wishes-pin-board" id="wishesPinBoard">
-          <!-- Populated by JS -->
+      <div class="gift-experience-container">
+        <!-- Interactive Status Badge / Direction Banner -->
+        <div class="gift-status-ribbon" id="giftStatusRibbon">
+          <span class="gift-status-icon">🎀</span>
+          <span class="gift-status-text" id="giftStatusText">Tap the golden bow or gift box to untie the ribbon!</span>
         </div>
+
+        <!-- The 3D Stage -->
+        <div class="gift-stage-wrapper" id="giftStageWrapper">
+          <!-- Ambient Glow Pedestal Platform -->
+          <div class="gift-pedestal-platform">
+            <div class="platform-ring ring-outer"></div>
+            <div class="platform-ring ring-inner"></div>
+            <div class="platform-disc"></div>
+          </div>
+
+          <!-- Inside Golden Light Eruption Rays (active on open) -->
+          <div class="gift-light-burst" id="giftLightBurst">
+            <div class="light-ray ray-1"></div>
+            <div class="light-ray ray-2"></div>
+            <div class="light-ray ray-3"></div>
+            <div class="light-ray ray-4"></div>
+            <div class="light-core-flare"></div>
+          </div>
+
+          <!-- Floating Sparkle Particles Canvas for Gift Box -->
+          <canvas id="giftSparkleCanvas" class="gift-sparkle-canvas"></canvas>
+
+          <!-- 3D Luxury Gift Box Model -->
+          <div class="gift-box-3d" id="giftBox3d" role="button" tabindex="0" aria-label="Interactive 3D Gift Box">
+            
+            <!-- Floating Box Lid (Lifts and tilts back on open) -->
+            <div class="gift-box-lid" id="giftBoxLid">
+              <div class="lid-top">
+                <div class="lid-surface-sheen"></div>
+                <!-- 3D Golden Ribbon Bands crossing on lid -->
+                <div class="ribbon-band ribbon-h ribbon-lid-h"></div>
+                <div class="ribbon-band ribbon-v ribbon-lid-v"></div>
+
+                <!-- 3D Ornate Golden Ribbon Bow on Top -->
+                <div class="golden-bow-assembly" id="goldenBowAssembly" title="Click to untie">
+                  <div class="bow-center-knot">
+                    <span class="knot-gem">✨</span>
+                  </div>
+                  <div class="bow-loop loop-left"></div>
+                  <div class="bow-loop loop-right"></div>
+                  <div class="bow-loop loop-top"></div>
+                  <div class="bow-loop loop-bottom"></div>
+                  <div class="bow-tail tail-left"></div>
+                  <div class="bow-tail tail-right"></div>
+                </div>
+              </div>
+              <div class="lid-rim rim-front"></div>
+              <div class="lid-rim rim-left"></div>
+              <div class="lid-rim rim-right"></div>
+              <div class="lid-rim rim-back"></div>
+            </div>
+
+            <!-- Box Base Body -->
+            <div class="gift-box-body" id="giftBoxBody">
+              <!-- Deep Velvet Interior Glow -->
+              <div class="box-interior-glow"></div>
+
+              <!-- Front Face with Gold Plaque & Ribbon -->
+              <div class="box-face face-front">
+                <div class="ribbon-band ribbon-v"></div>
+                <div class="box-royal-tag">
+                  <span class="tag-crown">👑</span>
+                  <span class="tag-name">FOR FAIZU</span>
+                  <span class="tag-from">From Arsh with Love</span>
+                </div>
+              </div>
+              <div class="box-face face-back">
+                <div class="ribbon-band ribbon-v"></div>
+              </div>
+              <div class="box-face face-left">
+                <div class="ribbon-band ribbon-v"></div>
+              </div>
+              <div class="box-face face-right">
+                <div class="ribbon-band ribbon-v"></div>
+              </div>
+              <div class="box-face face-bottom"></div>
+            </div>
+
+          </div>
+
+          <!-- The Floating Reveal Ticket / Golden Pass (Rises out of box) -->
+          <div class="golden-voucher-reveal" id="goldenVoucherReveal" aria-hidden="true">
+            <div class="voucher-hologram-shimmer"></div>
+            
+            <div class="voucher-card">
+              <!-- Premium Ticket Header -->
+              <div class="voucher-header">
+                <div class="voucher-brand">
+                  <span class="brand-crown">👑</span>
+                  <div class="brand-titles">
+                    <span class="brand-badge">EXCLUSIVE BIRTHDAY EDITION</span>
+                    <h3 class="voucher-main-title">THE BROTHERHOOD GOLDEN PASS</h3>
+                  </div>
+                </div>
+                <div class="voucher-pass-id">
+                  <span>PASS #FAIZU-2026-VIP</span>
+                </div>
+              </div>
+
+              <!-- Ticket Divider Line with Cutout Notches -->
+              <div class="voucher-notch-divider">
+                <span class="notch notch-left"></span>
+                <span class="divider-dashed-line"></span>
+                <span class="notch notch-right"></span>
+              </div>
+
+              <!-- Ticket Main Body -->
+              <div class="voucher-body">
+                <div class="voucher-beneficiary">
+                  <div class="beneficiary-meta">
+                    <span class="meta-label">ISSUED EXCLUSIVELY TO:</span>
+                    <strong class="beneficiary-name">Faiz Siddique (Faizu) ✨</strong>
+                  </div>
+                  <div class="beneficiary-status">
+                    <span class="status-pill"><i class="fa-solid fa-circle-check"></i> LIFETIME VALIDITY</span>
+                  </div>
+                </div>
+
+                <div class="voucher-perks-grid">
+                  <div class="perk-item">
+                    <div class="perk-icon-wrap">🍔</div>
+                    <div class="perk-info">
+                      <h4>All-Expenses-Paid Brother Outing</h4>
+                      <p>Full dinner, gaming lounge, or late-night food run — 100% sponsored by Arsh.</p>
+                    </div>
+                  </div>
+
+                  <div class="perk-item">
+                    <div class="perk-icon-wrap">🛡️</div>
+                    <div class="perk-info">
+                      <h4>24/7 Lifelong Alibi & Pillar</h4>
+                      <p>Whatever happens in life, anytime, anyplace — your big brother has your back.</p>
+                    </div>
+                  </div>
+
+                  <div class="perk-item">
+                    <div class="perk-icon-wrap">🚗</div>
+                    <div class="perk-info">
+                      <h4>VIP Chauffeur & Wingman Privilege</h4>
+                      <p>Designated driver, wingman, and emergency pickup whenever you call.</p>
+                    </div>
+                  </div>
+
+                  <div class="perk-item">
+                    <div class="perk-icon-wrap">🧥</div>
+                    <div class="perk-info">
+                      <h4>Unlimited Wardrobe Sharing Pass</h4>
+                      <p>Full permission to borrow Arsh's jackets & perfumes (just don't lose them!).</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Footer Sign-off & Seal -->
+                <div class="voucher-footer">
+                  <div class="voucher-endorsement">
+                    <span>Authorized & Endorsed with Unconditional Love:</span>
+                    <strong>Arsh Siddique ❤️</strong>
+                  </div>
+                  <div class="voucher-security-stamp">
+                    <span class="stamp-icon">🛡️</span>
+                    <span class="stamp-text">GENUINE • 100% BROTHER BOND</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ticket Action Bar -->
+              <div class="voucher-action-bar">
+                <button id="reboxGiftBtn" class="btn-voucher-action btn-rebox">
+                  <i class="fa-solid fa-rotate-left"></i> Re-box & Open Again
+                </button>
+                <button id="claimPassBtn" class="btn-voucher-action btn-claim">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Claimed by Faizu! 🎉
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </section>
-
-    <!-- ========================================================== -->
-    <!-- 7. FOOTER                                                  -->
-    <!-- ========================================================== -->
     <footer class="warm-footer reveal-on-scroll">
       <div class="footer-heart-symbol">❤️</div>
       <p class="footer-quote">
