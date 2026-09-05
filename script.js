@@ -1,153 +1,83 @@
 /**
  * FAIZU'S BIRTHDAY: LUXURY CELEBRATION SCRIPT
  * - Atmospheric First-Page Surprise Gateway with Touch Unlock
- * - Automated Button-Free Cinematic Cake Ceremony Sequencer
- * - Web Audio Acoustic Chimes & Music Box
- * - Interactive Polaroid Photo Wall & Persistent Guestbook
+ * - Automated Cinematic Cake Ceremony Sequencer
+ * - Warm Confetti Engine
+ * - Persistent Guestbook
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // =========================================================================
-  // 1. ACOUSTIC MUSIC BOX & CHIMES ENGINE
+  // 1. MINIMAL SOUND ENGINE (Confetti ding only — no music)
   // =========================================================================
-  class MusicBoxEngine {
-    constructor() {
-      this.ctx = null;
-      this.isPlaying = false;
-      this.loopTimer = null;
-    }
-
-    init() {
-      if (!this.ctx) {
+  const audio = {
+    _ctx: null,
+    _getCtx() {
+      if (!this._ctx) {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        this.ctx = new AudioCtx();
+        if (AudioCtx) this._ctx = new AudioCtx();
       }
-      if (this.ctx.state === 'suspended') {
-        this.ctx.resume();
-      }
-    }
-
-    playChime(freq, dur = 0.8, delay = 0) {
-      if (!this.ctx) return;
-      const t = this.ctx.currentTime + delay;
-
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-
+      if (this._ctx && this._ctx.state === 'suspended') this._ctx.resume();
+      return this._ctx;
+    },
+    playDing() {
+      const ctx = this._getCtx();
+      if (!ctx) return;
+      const t = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, t);
-
-      // Warm acoustic music box envelope
+      osc.frequency.setValueAtTime(1046.5, t);
       gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.18, t + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-
+      gain.gain.linearRampToValueAtTime(0.15, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.65);
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
-
+      gain.connect(ctx.destination);
       osc.start(t);
-      osc.stop(t + dur);
-    }
-
-    playMelody() {
-      this.init();
-      if (this.isPlaying) return;
-      this.isPlaying = true;
-
-      const notes = {
-        G4: 392.00, A4: 440.00, B4: 493.88, C5: 523.25,
-        D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99
-      };
-
-      const score = [
-        ['G4', 0.4, 0.45], ['G4', 0.25, 0.3], ['A4', 0.55, 0.6], ['G4', 0.55, 0.6], ['C5', 0.55, 0.6], ['B4', 0.9, 1.1],
-        ['G4', 0.4, 0.45], ['G4', 0.25, 0.3], ['A4', 0.55, 0.6], ['G4', 0.55, 0.6], ['D5', 0.55, 0.6], ['C5', 0.9, 1.1],
-        ['G4', 0.4, 0.45], ['G4', 0.25, 0.3], ['G5', 0.65, 0.7], ['E5', 0.55, 0.6], ['C5', 0.55, 0.6], ['B4', 0.55, 0.6], ['A4', 0.8, 1.0],
-        ['F5', 0.4, 0.45], ['F5', 0.25, 0.3], ['E5', 0.55, 0.6], ['C5', 0.55, 0.6], ['D5', 0.65, 0.7], ['C5', 1.2, 1.6]
-      ];
-
-      const runLoop = () => {
-        if (!this.isPlaying) return;
-        let cumulative = 0;
-        score.forEach(([n, d, gap]) => {
-          this.playChime(notes[n], d, cumulative);
-          cumulative += gap;
-        });
-
-        this.loopTimer = setTimeout(() => {
-          if (this.isPlaying) runLoop();
-        }, cumulative * 1000 + 1500);
-      };
-
-      runLoop();
-    }
-
-    stopMelody() {
-      this.isPlaying = false;
-      if (this.loopTimer) clearTimeout(this.loopTimer);
-    }
-
-    // Soft gentle breeze / candle extinguish sound
+      osc.stop(t + 0.65);
+    },
     playBlowSound() {
-      this.init();
-      const bufferSize = this.ctx.sampleRate * 0.45;
-      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const ctx = this._getCtx();
+      if (!ctx) return;
+      const bufferSize = ctx.sampleRate * 0.45;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const data = buffer.getChannelData(0);
       for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-
-      const noise = this.ctx.createBufferSource();
+      const noise = ctx.createBufferSource();
       noise.buffer = buffer;
-
-      const filter = this.ctx.createBiquadFilter();
+      const filter = ctx.createBiquadFilter();
       filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(450, this.ctx.currentTime);
-      filter.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.45);
-
-      const gain = this.ctx.createGain();
-      gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.45);
-
+      filter.frequency.setValueAtTime(450, ctx.currentTime);
+      filter.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.45);
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
       noise.connect(filter);
       filter.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(ctx.destination);
       noise.start();
-    }
-
-    playDing() {
-      this.init();
-      this.playChime(1046.5, 0.65, 0);
-    }
-
+    },
     playMagicHarp() {
-      this.init();
+      const ctx = this._getCtx();
+      if (!ctx) return;
       const chord = [523.25, 659.25, 783.99, 1046.5, 1318.51];
       chord.forEach((freq, idx) => {
-        this.playChime(freq, 0.9, idx * 0.08);
+        const t = ctx.currentTime + idx * 0.08;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.18, t + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.9);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.9);
       });
     }
-  }
-
-  const audio = new MusicBoxEngine();
-
-  // Floating Sound Pill Controls
-  const musicToggleBtn = document.getElementById('musicToggleBtn');
-  const musicLabel = document.getElementById('musicLabel');
-
-  if (musicToggleBtn) {
-    musicToggleBtn.addEventListener('click', () => {
-      audio.init();
-      if (!audio.isPlaying) {
-        audio.playMelody();
-        musicToggleBtn.classList.add('playing');
-        musicLabel.textContent = 'Melody Playing 🎶';
-      } else {
-        audio.stopMelody();
-        musicToggleBtn.classList.remove('playing');
-        musicLabel.textContent = 'Play Soft Melody';
-      }
-    });
-  }
+  };
 
   // =========================================================================
   // 2. FIRST-PAGE SURPRISE GATEWAY: LIVING CELESTIAL UNIVERSE ENGINE
@@ -370,15 +300,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Play magical harp chime
     audio.playMagicHarp();
-
-    // Start background music
-    setTimeout(() => {
-      audio.playMelody();
-      if (musicToggleBtn) {
-        musicToggleBtn.classList.add('playing');
-        musicLabel.textContent = 'Melody Playing 🎶';
-      }
-    }, 400);
 
     // Gateway exit animation
     if (surpriseGateway) {
@@ -799,94 +720,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // 6. POLAROID WALL & LOCALSTORAGE PHOTO UPLOADS
-  // =========================================================================
-  const realPhotoUpload = document.getElementById('realPhotoUpload');
-  const polaroidFrames = document.querySelectorAll('.polaroid-frame');
-  const resetPhotosBtn = document.getElementById('resetPhotosBtn');
-  let activeFrameIndex = null;
-
-  // Load saved photos from localStorage
-  function loadSavedPhotos() {
-    try {
-      const saved = JSON.parse(localStorage.getItem('faizu_bday_photos_v1') || '{}');
-      polaroidFrames.forEach(frame => {
-        const idx = frame.getAttribute('data-index');
-        const box = frame.querySelector('.polaroid-photo-box');
-        const img = frame.querySelector('.real-img');
-        if (saved[idx] && img && box) {
-          img.src = saved[idx];
-          box.classList.add('has-img');
-        }
-      });
-    } catch (e) {
-      console.warn('Could not read photos from localStorage', e);
-    }
-  }
-  loadSavedPhotos();
-
-  // Handle Photo upload click
-  polaroidFrames.forEach(frame => {
-    const editBtn = frame.querySelector('.frame-edit-trigger');
-    const photoBox = frame.querySelector('.polaroid-photo-box');
-
-    const triggerUpload = () => {
-      activeFrameIndex = frame.getAttribute('data-index');
-      if (realPhotoUpload) realPhotoUpload.click();
-    };
-
-    if (editBtn) editBtn.addEventListener('click', (e) => { e.stopPropagation(); triggerUpload(); });
-    if (photoBox) photoBox.addEventListener('click', triggerUpload);
-  });
-
-  if (realPhotoUpload) {
-    realPhotoUpload.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file || activeFrameIndex === null) return;
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target.result;
-        const targetFrame = document.querySelector(`.polaroid-frame[data-index="${activeFrameIndex}"]`);
-        if (targetFrame) {
-          const img = targetFrame.querySelector('.real-img');
-          const box = targetFrame.querySelector('.polaroid-photo-box');
-          img.src = dataUrl;
-          box.classList.add('has-img');
-
-          try {
-            const saved = JSON.parse(localStorage.getItem('faizu_bday_photos_v1') || '{}');
-            saved[activeFrameIndex] = dataUrl;
-            localStorage.setItem('faizu_bday_photos_v1', JSON.stringify(saved));
-          } catch (err) {
-            console.warn('LocalStorage full, photo displayed only for session', err);
-          }
-
-          audio.playDing();
-          triggerWarmConfetti(window.innerWidth * 0.5, window.innerHeight * 0.5, 60);
-        }
-      };
-      reader.readAsDataURL(file);
-      realPhotoUpload.value = '';
-    });
-  }
-
-  if (resetPhotosBtn) {
-    resetPhotosBtn.addEventListener('click', () => {
-      if (confirm('Reset custom photos back to artwork?')) {
-        localStorage.removeItem('faizu_bday_photos_v1');
-        polaroidFrames.forEach(frame => {
-          const box = frame.querySelector('.polaroid-photo-box');
-          const img = frame.querySelector('.real-img');
-          if (img) img.src = '';
-          if (box) box.classList.remove('has-img');
-        });
-      }
-    });
-  }
-
-  // =========================================================================
-  // 7. GUESTBOOK / BIRTHDAY WISHES BOARD
+  // 6. GUESTBOOK / BIRTHDAY WISHES BOARD
   // =========================================================================
   const warmWishForm = document.getElementById('warmWishForm');
   const wishesPinBoard = document.getElementById('wishesPinBoard');
@@ -896,7 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const defaultWishes = [
     {
-      name: 'Your Big Brother ❤️',
+      name: 'Arsh (Big Brother) ❤️',
       text: 'Faizu, you will always have my back, my loyalty, and my love. Never stop dreaming big, little bro!',
       time: 'Just now'
     },
@@ -1053,6 +887,62 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // =========================================================================
+  // 9. POLAROID LIGHTBOX EXPANDER
+  // =========================================================================
+  function initPolaroidLightbox() {
+    const lightbox = document.getElementById('polaroidLightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxTitle = document.getElementById('lightboxTitle');
+    const lightboxSub = document.getElementById('lightboxSub');
+    const closeBtn = document.getElementById('lightboxCloseBtn');
+    const backdrop = document.getElementById('lightboxBackdrop');
+    const polaroidFrames = document.querySelectorAll('.polaroid-frame');
+
+    if (!lightbox || !lightboxImg) return;
+
+    function openLightbox(frame) {
+      const img = frame.querySelector('.real-img');
+      const caption = frame.querySelector('.handwritten-caption');
+      const sub = frame.querySelector('.polaroid-bottom small');
+
+      if (!img || !img.getAttribute('src')) return;
+
+      lightboxImg.src = img.src;
+      lightboxImg.alt = img.alt || 'Polaroid Memory';
+      if (lightboxTitle) lightboxTitle.textContent = caption ? caption.textContent : 'Precious Memory';
+      if (lightboxSub) lightboxSub.textContent = sub ? sub.textContent : '';
+
+      lightbox.classList.add('active');
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      audio.playDing();
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    polaroidFrames.forEach(frame => {
+      frame.addEventListener('click', () => {
+        openLightbox(frame);
+      });
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+    if (backdrop) backdrop.addEventListener('click', closeLightbox);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+        closeLightbox();
+      }
+    });
+  }
+
   initCard3dTilt();
+  initPolaroidLightbox();
 
 });
+

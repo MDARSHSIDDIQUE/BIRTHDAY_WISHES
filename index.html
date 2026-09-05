@@ -76,14 +76,6 @@
   <canvas id="bokehCanvas"></canvas>
   <canvas id="confettiCanvas"></canvas>
 
-  <!-- Sound Toggle Pill (Floating Glass) -->
-  <div class="sound-pill" id="soundPill">
-    <button id="musicToggleBtn" class="pill-btn" aria-label="Toggle Birthday Melody">
-      <span class="music-note-icon">🎵</span>
-      <span id="musicLabel">Play Soft Melody</span>
-    </button>
-  </div>
-
   <!-- ========================================================== -->
   <!-- 2. MAIN CELEBRATION WEBSITE (REVEALED ON UNLOCK)           -->
   <!-- ========================================================== -->
@@ -255,7 +247,7 @@
           <p>
             "May every coming year of your life be filled with even more joy, blessings, and success than the last. Keep shining always!"
           </p>
-          <span class="note-writer">— Your Big Brother ❤️</span>
+          <span class="note-writer">— Your Big Brother, Arsh ❤️</span>
         </div>
       </div>
     </section>
@@ -268,23 +260,31 @@
         <span class="handwritten-sub">Captured Memories</span>
         <h2 class="section-heading">Our Polaroid Wall 📸</h2>
         <p class="section-intro">
-          Tap any frame to upload real photos of us — they save directly in your browser!
+          Our most precious moments, frozen forever in time. ❤️
         </p>
-        <button id="resetPhotosBtn" class="btn-subtle-link">Reset Photos</button>
-        <input type="file" id="realPhotoUpload" accept="image/*" style="display: none;">
       </div>
 
-      <div class="polaroid-grid">
-        <!-- Frame 1 -->
-        <div class="polaroid-frame frame-tilt-1" data-index="0">
+      <!-- 1. Featured Top: Full Landscape Family First Memory -->
+      <div class="polaroid-featured-wrapper">
+        <div class="polaroid-frame frame-featured-landscape family-frame" data-caption="Family First 🤍">
           <div class="push-pin">📍</div>
-          <div class="polaroid-photo-box">
-            <img src="" alt="Faizu Memory" class="real-img">
-            <div class="placeholder-art art-cocoa">
-              <span class="art-emoji">🚀</span>
-              <span class="art-caption">Partners in Crime</span>
-            </div>
-            <button class="frame-edit-trigger" title="Change Photo"><i class="fa-solid fa-pen"></i></button>
+          <div class="polaroid-photo-box has-img family-landscape-box">
+            <img src="assets/photo3.jpg" alt="Family First - Arsh, Ammi & Faizu" class="real-img family-landscape-img">
+          </div>
+          <div class="polaroid-bottom">
+            <span class="handwritten-caption featured-caption">Family First 🤍</span>
+            <small>Unconditional love, pure blessings & forever togetherness</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. The 3 Photos Underneath in an Attractive Balanced Row -->
+      <div class="polaroid-trio-grid">
+        <!-- Frame 1: Brothers -->
+        <div class="polaroid-frame frame-tilt-1" data-caption="Partners in Crime 🚀">
+          <div class="push-pin">📍</div>
+          <div class="polaroid-photo-box has-img">
+            <img src="assets/photo1.jpg" alt="Arsh & Faizu together" class="real-img">
           </div>
           <div class="polaroid-bottom">
             <span class="handwritten-caption">Partners in Crime 🚀</span>
@@ -292,53 +292,26 @@
           </div>
         </div>
 
-        <!-- Frame 2 -->
-        <div class="polaroid-frame frame-tilt-2" data-index="1">
+        <!-- Frame 2: Faizu Sherwani -->
+        <div class="polaroid-frame frame-tilt-2" data-caption="The King Himself ✨">
           <div class="push-pin">📍</div>
-          <div class="polaroid-photo-box">
-            <img src="" alt="Faizu Memory" class="real-img">
-            <div class="placeholder-art art-gold">
-              <span class="art-emoji">✨</span>
-              <span class="art-caption">The King Himself</span>
-            </div>
-            <button class="frame-edit-trigger" title="Change Photo"><i class="fa-solid fa-pen"></i></button>
+          <div class="polaroid-photo-box has-img">
+            <img src="assets/photo2.jpg" alt="Faizu the King" class="real-img">
           </div>
           <div class="polaroid-bottom">
-            <span class="handwritten-caption">Swagger: 10/10 ✨</span>
+            <span class="handwritten-caption">The King Himself ✨</span>
             <small>Always looking sharp, always confident</small>
           </div>
         </div>
 
-        <!-- Frame 3 -->
-        <div class="polaroid-frame frame-tilt-3" data-index="2">
+        <!-- Frame 3: Faizu Star -->
+        <div class="polaroid-frame frame-tilt-4" data-caption="Faizu the Star 🌟">
           <div class="push-pin">📍</div>
-          <div class="polaroid-photo-box">
-            <img src="" alt="Faizu Memory" class="real-img">
-            <div class="placeholder-art art-terracotta">
-              <span class="art-emoji">🌙</span>
-              <span class="art-caption">Late Night Talks</span>
-            </div>
-            <button class="frame-edit-trigger" title="Change Photo"><i class="fa-solid fa-pen"></i></button>
+          <div class="polaroid-photo-box has-img">
+            <img src="assets/photo4.jpg" alt="Faizu smiling" class="real-img">
           </div>
           <div class="polaroid-bottom">
-            <span class="handwritten-caption">Late Night Talks 🌙</span>
-            <small>Conversations only brothers understand</small>
-          </div>
-        </div>
-
-        <!-- Frame 4 -->
-        <div class="polaroid-frame frame-tilt-4" data-index="3">
-          <div class="push-pin">📍</div>
-          <div class="polaroid-photo-box">
-            <img src="" alt="Faizu Memory" class="real-img">
-            <div class="placeholder-art art-sage">
-              <span class="art-emoji">🤝</span>
-              <span class="art-caption">Brothers For Life</span>
-            </div>
-            <button class="frame-edit-trigger" title="Change Photo"><i class="fa-solid fa-pen"></i></button>
-          </div>
-          <div class="polaroid-bottom">
-            <span class="handwritten-caption">Brothers for Life 🤝</span>
+            <span class="handwritten-caption">Faizu the Star 🌟</span>
             <small>An unbreakable bond till the end of time</small>
           </div>
         </div>
@@ -381,7 +354,7 @@
 
           <div class="letter-signature-block">
             <span>Always By Your Side,</span>
-            <strong>Your Big Brother</strong>
+            <strong>Your Big Brother, Arsh ❤️</strong>
           </div>
         </div>
       </div>
@@ -403,7 +376,7 @@
           <h3>Write a wish for Faizu:</h3>
           <div class="form-field">
             <label for="wisherName">Your Name / Relationship</label>
-            <input type="text" id="wisherName" placeholder="e.g. Your Big Brother, Mom & Dad, Friend..." required maxlength="40">
+            <input type="text" id="wisherName" placeholder="e.g. Arsh, Mom & Dad, Friend..." required maxlength="40">
           </div>
           <div class="form-field">
             <label for="wisherText">Your Message / Blessing</label>
@@ -429,12 +402,40 @@
       <p class="footer-quote">
         "Brothers aren't just family. They are the best gift your parents ever gave you."
       </p>
-      <p class="footer-sign">Made with unconditional love by Big Brother for Faizu • September 2026</p>
+      
+      <div class="footer-credit-badge">
+        <span class="creator-sparkle">✨</span>
+        <span>Crafted with love by <strong class="author-highlight">Arsh</strong> for his brother Faizu</span>
+        <span class="creator-sparkle">✨</span>
+      </div>
+
+      <p class="footer-sign">Made with unconditional love by Arsh for Faizu • September 2026</p>
+      
       <button id="confettiReplayBtn" class="btn-aesthetic btn-subtle">
         🎉 Celebrate One More Time!
       </button>
     </footer>
 
+  </div>
+
+  <!-- Polaroid Lightbox Modal for High-Res Zoomed View -->
+  <div id="polaroidLightbox" class="polaroid-lightbox" aria-hidden="true">
+    <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+    <div class="lightbox-wrapper">
+      <button class="lightbox-close-btn" id="lightboxCloseBtn" aria-label="Close Lightbox">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="lightbox-card">
+        <div class="lightbox-pin">📍</div>
+        <div class="lightbox-img-box">
+          <img id="lightboxImg" src="" alt="Zoomed memory">
+        </div>
+        <div class="lightbox-caption-area">
+          <h3 id="lightboxTitle" class="lightbox-title"></h3>
+          <p id="lightboxSub" class="lightbox-sub"></p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="script.js"></script>
