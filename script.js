@@ -892,6 +892,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const wishesPinBoard = document.getElementById('wishesPinBoard');
   const wisherName = document.getElementById('wisherName');
   const wisherText = document.getElementById('wisherText');
+  const resetWishesBtn = document.getElementById('resetWishesBtn');
 
   const defaultWishes = [
     {
@@ -924,18 +925,59 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!wishesPinBoard) return;
     const wishes = getStoredWishes();
     wishesPinBoard.innerHTML = '';
-    wishes.forEach(w => {
+
+    if (wishes.length === 0) {
+      wishesPinBoard.innerHTML = `
+        <div class="empty-wishes-msg">
+          <span class="empty-icon">💌</span>
+          <p>No wishes on the board right now.</p>
+          <small>Be the first to post a new wish for Faizu!</small>
+        </div>
+      `;
+      return;
+    }
+
+    wishes.forEach((w, index) => {
       const card = document.createElement('div');
       card.className = 'wish-post-card';
       card.innerHTML = `
         <div class="wish-card-header">
           <span class="wish-author">${escapeHTML(w.name)}</span>
-          <span class="wish-time">${escapeHTML(w.time)}</span>
+          <div class="wish-meta-actions">
+            <span class="wish-time">${escapeHTML(w.time)}</span>
+            <button class="delete-wish-btn" data-index="${index}" title="Delete Wish" aria-label="Delete Wish">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
         </div>
         <p class="wish-message">${escapeHTML(w.text)}</p>
       `;
+
+      const delBtn = card.querySelector('.delete-wish-btn');
+      if (delBtn) {
+        delBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteWish(index);
+        });
+      }
+
       wishesPinBoard.appendChild(card);
     });
+  }
+
+  function deleteWish(index) {
+    if (confirm('Are you sure you want to delete this wish note?')) {
+      const wishes = getStoredWishes();
+      if (index >= 0 && index < wishes.length) {
+        wishes.splice(index, 1);
+        try {
+          localStorage.setItem('faizu_bday_guestbook_v1', JSON.stringify(wishes));
+        } catch (err) {
+          console.warn('Could not save updated wishes to localStorage', err);
+        }
+        renderWishes();
+      }
+    }
   }
 
   function escapeHTML(str) {
@@ -945,6 +987,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   renderWishes();
+
+  if (resetWishesBtn) {
+    resetWishesBtn.addEventListener('click', () => {
+      if (confirm('Reset wishes back to default notes?')) {
+        localStorage.removeItem('faizu_bday_guestbook_v1');
+        renderWishes();
+      }
+    });
+  }
 
   if (warmWishForm) {
     warmWishForm.addEventListener('submit', (e) => {

@@ -1634,9 +1634,78 @@ body {
   color: var(--gold-light);
 }
 
+.wish-meta-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .wish-time {
   font-size: 0.76rem;
   color: var(--text-muted);
+}
+
+.delete-wish-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.5);
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.78rem;
+  transition: all 0.25s ease;
+}
+
+.delete-wish-btn:hover {
+  background: rgba(220, 38, 38, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #ef4444;
+  transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+}
+
+.empty-wishes-msg {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(223, 177, 91, 0.2);
+  border-radius: 16px;
+  color: var(--text-muted);
+}
+
+.empty-wishes-msg .empty-icon {
+  font-size: 2.2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.empty-wishes-msg p {
+  font-size: 1.05rem;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+}
+
+.btn-subtle-link {
+  background: transparent;
+  border: none;
+  color: var(--gold-light);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  opacity: 0.7;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  margin-top: 0.5rem;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.btn-subtle-link:hover {
+  opacity: 1;
+  color: var(--gold-primary);
 }
 
 .wish-message {
